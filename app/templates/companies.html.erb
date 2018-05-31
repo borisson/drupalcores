@@ -42,7 +42,7 @@
       <% values['contributors'].each do |contributor, mentions| %>
       <tr>
         <td><a href="https://www.drupal.org/u/<%= contributor.gsub ' ', '-' %>"><%= contributor %></a></td>
-        <td><a href="http://cgit.drupalcode.org/drupal/log/?qt=grep&q=<%= contributor.gsub ' ', '+' %>"><%= mentions %></a></td>
+        <td><%= mentions %></td>
       </tr>
       <% end %>
     </table>

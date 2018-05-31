@@ -153,7 +153,7 @@ sum = contributors.values.reduce(:+).to_f
 puts ERB.new(DATA.readlines.join, 0, '>').result
 
 time = Time.now()
-description = "A simple table of all contributors to Drupal 8 core"
+description = "A simple table of all contributors to Search API's ecosystem"
 header = ERB.new(File.new("../templates/partials/header.html.erb").read).result(binding)
 footer = ERB.new(File.new("../templates/partials/footer.html.erb").read).result(binding)
 companies_template = File.open("../templates/companies.html.erb", 'r').read

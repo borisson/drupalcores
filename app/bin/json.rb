@@ -1,53 +1,70 @@
 #!/usr/bin/env ruby
 
-log_args = ARGV[0] || '--since=2011-03-09'
-git_command = <<-COMMANDS
-cd ../drupalcore
-git fetch
-git remote update
-git remote set-head origin -a
-git log origin/HEAD #{log_args} -s --format=%s
-cd ../bin
-COMMANDS
+directories = Array.new()
+directories.push("search_api")
+directories.push("search_api_solr")
+directories.push("search_api_page")
+directories.push("search_api_sorts")
+directories.push("search_api_autocomplete")
+directories.push("search_api_attachments")
+directories.push("search_api_location")
+directories.push("facets")
+directories.push("facets_pretty_paths")
 
 Encoding.default_external = Encoding::UTF_8
 require 'erb'
 require 'yaml'
 require 'json'
 
+def updateCommits(directory)
+  reverts_regexp = Regexp.new '^Revert \"(?<credits>.+#[0-9]+.* by [^:]+:).*'
+  reverts_regexp_loose = Regexp.new '^Revert .*(?<issue>#[0-9]+).*'
+
+  system('cd ../' + directory)
+  git_command = <<-COMMANDS
+  cd ../#{directory}
+  git fetch
+  git remote update
+  git remote set-head origin -a
+  git log origin/HEAD --since=2011-03-09 -s --format=%s
+  cd ../bin
+  COMMANDS
+  %x[#{git_command}].split("\n").each do |c|
+    if c =~ reverts_regexp then
+      $reverts.push(c[reverts_regexp, "credits"])
+    elsif c =~ reverts_regexp_loose then
+      $reverts.push(c[reverts_regexp_loose, "issue"])
+    else
+      $commits.push(c)
+    end
+  end
+end
+
 name_mappings = YAML::load_file('../config/name_mappings.yml')
 contributors = Hash.new(0)
-commits = Array.new
-reverts = Array.new
+$commits = Array.new
+$reverts = Array.new
 issue_regexp = Regexp.new '#[0-9]+'
-reverts_regexp = Regexp.new '^Revert \"(?<credits>.+#[0-9]+.* by [^:]+:).*'
-reverts_regexp_loose = Regexp.new '^Revert .*(?<issue>#[0-9]+).*'
 
-%x[#{git_command}].split("\n").each do |c|
-  if c =~ reverts_regexp then
-    reverts.push(c[reverts_regexp, "credits"])
-  elsif c =~ reverts_regexp_loose then
-    reverts.push(c[reverts_regexp_loose, "issue"])
-  else
-    commits.push(c)
+directories.each do |m|
+  updateCommits(m)
+end
+
+$commits.each_with_index do |c, i|
+  if r = $reverts.index{ |item| c.index(item) == 0 }
+    $commits.delete_at(i)
+    $reverts.delete_at(r)
   end
 end
 
-commits.each_with_index do |c, i|
-  if r = reverts.index{ |item| c.index(item) == 0 }
-    commits.delete_at(i)
-    reverts.delete_at(r)
+$commits.to_enum.with_index.reverse_each do |c, i|
+  if r = $reverts.index{ |item| item[issue_regexp] == c[issue_regexp] }
+    $commits.delete_at(i)
+    $reverts.delete_at(r)
   end
 end
 
-commits.to_enum.with_index.reverse_each do |c, i|
-  if r = reverts.index{ |item| item[issue_regexp] == c[issue_regexp] }
-    commits.delete_at(i)
-    reverts.delete_at(r)
-  end
-end
-
-commits.each do |m|
+$commits.each do |m|
   m.gsub(/\-/, '_').scan(/\s(?:by\s?)([[:word:]\s,.|]+):/i).each do |people|
     people[0].split(/(?:,|\||\band\b|\bet al(?:.)?)/).each do |p|
       name = p.strip.downcase

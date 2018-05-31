@@ -19,7 +19,18 @@ var paths = {
   scripts: 'app/js/**/*.js',
   images: 'app/images/**/*',
   scss: 'app/scss/**/*.scss',
-  drupal: 'app/drupalcore'
+  drupal: 'app/drupalcore',
+  modules: [
+    'search_api',
+    'facets',
+    'search_api_solr',
+    'search_api_page',
+    'search_api_autocomplete',
+    'search_api_sorts',
+    'search_api_attachments',
+    'search_api_location',
+    'facets_pretty_paths',
+  ]
 };
 
 // Run bower install
@@ -36,10 +47,13 @@ gulp.task('lint', function() {
 // Clone or update drupalcore repo
 gulp.task('drupalcore', function () {
   var fs = require('fs');
+  paths.modules.forEach(element => {
+    gulp.src('')
+    .pipe(gulpif(!fs.existsSync('app/' + element), shell(['git clone http://git.drupal.org/project/'+element+'.git app/' + element])))
+    .pipe(shell(['git remote update', 'git remote set-head origin -a', 'git checkout origin/HEAD'],{ 'ignoreErrors': true, 'cwd': './app/' + element}))
+  });
 
-  return gulp.src('')
-    .pipe(gulpif(!fs.existsSync(paths.drupal), shell(['git clone http://git.drupal.org/project/drupal.git ' + paths.drupal])))
-    .pipe(shell(['git remote update', 'git remote set-head origin -a', 'git checkout origin/HEAD'],{ 'ignoreErrors': true, 'cwd': './app/drupalcore'}));
+  return 1
 });
 
 // Build contributors page

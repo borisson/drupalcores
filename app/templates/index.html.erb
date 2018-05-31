@@ -2,6 +2,11 @@
     <div class="main-content-wrap outer">
       <section class="main-content inner">
         <div class="table-filter">
+          <p>
+          This is an aggregate of stats for the following modules: <br />
+          search_api, search_api_solr, search_api_page, search_api_sorts, search_api_autocomplete, search_api_attachments, search_api_location
+          facets, facets_pretty_paths
+          </p>
           Total: <%= contributors.length %> contributors
           <ul>
             <li><a href="index.html">List Contributors</a></li>
@@ -24,18 +29,19 @@
   <th>Percent</th>
  </tr>
  <% contributors.each do |name, mentions| %>
- <% notSpecified = (name === 'Not specified') %>
- <tr id="<%= name %>">
-  <td><%= (lastMentions == mentions) ? lastOrder : i %></td>
-  <td><% if !notSpecified %><a href="https://www.drupal.org/u/<%= name.gsub ' ', '-' %>"><%= name %></a><% else %><%= name %><% end %>
-  </td>
-  <td><% if !notSpecified %><a href="http://cgit.drupalcode.org/drupal/log/?qt=grep&q=<%= name.gsub ' ', '+' %>"><%= mentions %></a><% else %><%= mentions %><% end %></td>
-  <td><%= ((mentions/sum)*100).round(4) %>%</td>
-  <% if lastMentions != mentions %>
-    <% lastOrder = i %>
-  <% end %>
-  <% i += 1 %>
-  <% lastMentions = mentions %></tr>
+  <% notSpecified = (name === 'Not specified') %>
+  <tr id="<%= name %>">
+    <td><%= (lastMentions == mentions) ? lastOrder : i %></td>
+    <td><% if !notSpecified %><a href="https://www.drupal.org/u/<%= name.gsub ' ', '-' %>"><%= name %></a><% else %><%= name %><% end %>
+    </td>
+    <td><%= mentions %></td>
+    <td><%= ((mentions/sum)*100).round(4) %>%</td>
+    <% if lastMentions != mentions %>
+      <% lastOrder = i %>
+    <% end %>
+    <% i += 1 %>
+    <% lastMentions = mentions %>
+  </tr>
  <% end %>
 
 </table>
