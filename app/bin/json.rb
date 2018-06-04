@@ -3,11 +3,13 @@
 directories = Array.new()
 directories.push("search_api")
 directories.push("search_api_solr")
+directories.push("search_api_solr_multilingual")
 directories.push("search_api_page")
 directories.push("search_api_sorts")
 directories.push("search_api_autocomplete")
 directories.push("search_api_attachments")
 directories.push("search_api_location")
+directories.push("search_api_saved_searches")
 directories.push("facets")
 directories.push("facets_pretty_paths")
 

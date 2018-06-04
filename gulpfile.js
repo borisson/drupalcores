@@ -24,12 +24,14 @@ var paths = {
     'search_api',
     'facets',
     'search_api_solr',
+    'search_api_solr_multilingual',
     'search_api_page',
     'search_api_autocomplete',
     'search_api_sorts',
     'search_api_attachments',
     'search_api_location',
     'facets_pretty_paths',
+    'search_api_saved_searches',
   ]
 };
 
